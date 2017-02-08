@@ -1,0 +1,27 @@
+body {
+  font-family: monospace;
+}
+
+  main {
+    padding: 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+  }
+    aside {
+      flex-grow: 1;
+    }
+        button {
+          padding: 5px 20px;
+          text-align: center;
+          font-size: 1.4em;
+          background-color: skyblue;
+          color: white;
+          border: 0;
+          box-shadow: 1px 2px black;
+        }
+        input {
+          padding: 5px 20px;
+        }
+      }
