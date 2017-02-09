@@ -1,27 +1,20 @@
-// Settings
-var speed = 20,
+// globals
+var speed = 10,
     canvasWidth = window.innerWidth,
-    canvasHeight = window.innerHeight;
-
-var canvas,
+    canvasHeight = window.innerHeight,
+    canvas,
     ctx,
     times = 0,
-    limit = 500,
-    draw,
+    limit = 20,
     particles = [],
-    colors = ['#F56991', '#FF9F80', '#FFC48C', '#EFFAB4', '#D1F2A5'];
+    colors = ['#F56991', '#FF9F80', '#FFC48C', '#EFFAB4', '#D1F2A5'],
+    color = colors[4],
+    pos,
+    size = 10,
+    opacity = 1;;
 
-var getRand = function(type) {
-    if (type === 'size')
-        return (Math.floor(Math.random() * 8) * 10)
-
-    if (type === 'color')
-        return Math.floor(Math.random() * colors.length)
-
-    if (type === 'pos')
-        return [(Math.floor(Math.random() * canvasWidth)), (Math.floor(Math.random() * canvasHeight))]
-
-    return false
+var getRand = function() {
+    return [(Math.floor(Math.random() * canvasWidth)), (Math.floor(Math.random() * canvasHeight))]
 };
 
 var drawParticle = function(x, y, size, color, opacity) {
@@ -34,60 +27,50 @@ var drawParticle = function(x, y, size, color, opacity) {
     ctx.stroke();
 }
 
-function clean() {
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    particles.forEach(function(p) {
-        /*
-         * p[0] = x,
-         * p[1] = y,
-         * p[2] = color
-         * p[3] = globalAlpha,
-         * p[4] = size
-         * */
-        p[3] = p[3] - 0.06;
-        drawParticle(p[0], p[1], p[4], p[2], p[3])
-
-        if (p[p.length - 1] && p[3] <= 0.0) {
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            clearInterval(draw);
-            times = 0;
-            particles = []
-            draw = setInterval(update, speed);
+function throwDisc(mutex) {
+    if (hitSomething()) {
+        if (!mutex) {
+            drawParticle(pos[0], pos[1], size, color, opacity);
+            particles.push([pos[0], pos[1], color, opacity, size]);
         }
-    });
-}
-
-function update(args) {
-
-    var color = colors[getRand('color')],
-        pos = getRand('pos'),
-        size = getRand('size'),
-        opacity = 1;
-
-    drawParticle(pos[0], pos[1], size, color, opacity)
+        return;
+    }
     times++;
-
-    particles.push([pos[0], pos[1], color, opacity, size]);
-
-    if (times >= limit) {
-        clearInterval(draw);
-        draw = setInterval(clean, speed);
+    if (mutex == true) {
+        // clean();
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        particles = [];
+        setTimeout(function() {
+            throwDisc(false);
+        }, speed)
+    } else {
+        drawParticle(pos[0], pos[1], size, color, opacity)
+        particles.push([pos[0], pos[1], color, opacity, size]);
+        pos[0] += 0;
+        pos[1] -= 20;
+        setTimeout(function() {
+            throwDisc(true);
+        }, speed)
     }
 }
 
+var hitSomething = function() {
+    if (pos[1] <= 20) {
+        return true;
+    }
+    return false;
+};
 
 window.onload = function() {
-    var body = document.querySelector('body');
-    body.style.background = '#2C2C44';
-
     canvas = document.getElementById('particles'),
         ctx = canvas.getContext('2d');
-    body.style.margin = '0px';
-    canvas.style.margin = '0px';
-    canvas.style.padding = '0px';
-
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
+};
 
-    draw = setInterval(update, speed);
-}
+
+document.addEventListener("click", function() {
+    times = 0;
+    pos = [canvasWidth / 2, canvasHeight - 30];
+    throwDisc(false);
+});
