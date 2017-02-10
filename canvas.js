@@ -1,5 +1,5 @@
 // globals
-var speed = 10,
+var speed = 1,
     canvasWidth = window.innerWidth,
     canvasHeight = window.innerHeight,
     canvas,
@@ -47,12 +47,45 @@ function throwDisc(mutex) {
         drawParticle(pos[0], pos[1], size, color, opacity)
         particles.push([pos[0], pos[1], color, opacity, size]);
         pos[0] += 0;
-        pos[1] -= 20;
+        pos[1] -= 10;
         setTimeout(function() {
             throwDisc(true);
         }, speed)
     }
 }
+
+function throwHyzer(mutex) {
+    if (hitSomething()) {
+        if (!mutex) {
+            drawParticle(pos[0], pos[1], size, color, opacity);
+            particles.push([pos[0], pos[1], color, opacity, size]);
+        }
+        return;
+    }
+    times++;
+    if (mutex == true) {
+        // clean();
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        particles = [];
+        setTimeout(function() {
+            throwHyzer(false);
+        }, speed)
+    } else {
+        drawParticle(pos[0], pos[1], size, color, opacity)
+        particles.push([pos[0], pos[1], color, opacity, size]);
+        console.log(times)
+        if (times > 120) {
+          console.log("here")
+          pos[0] -= 5;
+
+        }
+        pos[1] -= 10;
+        setTimeout(function() {
+            throwHyzer(true);
+        }, speed)
+    }
+}
+
 
 var hitSomething = function() {
     if (pos[1] <= 20) {
@@ -72,5 +105,6 @@ window.onload = function() {
 document.addEventListener("click", function() {
     times = 0;
     pos = [canvasWidth / 2, canvasHeight - 30];
-    throwDisc(false);
+    // throwDisc(false);
+    throwHyzer(false);
 });
